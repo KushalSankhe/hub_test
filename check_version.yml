@@ -1,0 +1,20 @@
+---
+- name: Verify Active Collection Version
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Ask Ansible for its collection search order
+      ansible.builtin.command: ansible --version
+      register: ansible_info
+
+    - name: Print the search order to the logs
+      ansible.builtin.debug:
+        var: ansible_info.stdout_lines
+        
+    - name: Ask the engine which version of ServiceNow is currently active
+      ansible.builtin.command: ansible-galaxy collection list servicenow.itsm
+      register: active_version
+
+    - name: Print the winning version to the logs
+      ansible.builtin.debug:
+        var: active_version.stdout_lines
