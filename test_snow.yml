@@ -1,0 +1,8 @@
+---
+- name: Test Dynamic ServiceNow Collection Injection
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Try to find an incident (This will fail, and that is a good thing!)
+      servicenow.itsm.incident_info:
+        number: INC0000001
