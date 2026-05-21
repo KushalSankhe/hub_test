@@ -1,0 +1,12 @@
+---
+- name: Check EE Built-in Collections
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Ask the container what collections it has installed
+      ansible.builtin.command: ansible-galaxy collection list
+      register: ee_inventory
+
+    - name: Print the inventory to the logs
+      ansible.builtin.debug:
+        var: ee_inventory.stdout_lines
