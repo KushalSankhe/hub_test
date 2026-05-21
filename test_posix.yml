@@ -1,0 +1,23 @@
+---
+- name: Test Dynamic POSIX Collection Injection
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create a dummy file in the container
+      ansible.builtin.file:
+        path: /tmp/source_file.txt
+        state: touch
+
+    - name: Use the POSIX collection to synchronize the file
+      ansible.posix.synchronize:
+        src: /tmp/source_file.txt
+        dest: /tmp/destination_file.txt
+
+    - name: Verify the copy was successful
+      ansible.builtin.stat:
+        path: /tmp/destination_file.txt
+      register: file_check
+
+    - name: Output the result
+      ansible.builtin.debug:
+        msg: "Success! The ansible.posix module ran perfectly. File exists: {{ file_check.stat.exists }}"
