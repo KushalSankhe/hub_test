@@ -10,9 +10,9 @@
     - name: Print the search order to the logs
       ansible.builtin.debug:
         var: ansible_info.stdout_lines
-        
+
     - name: Ask the engine which version of ServiceNow is currently active
-      ansible.builtin.command: ansible-galaxy collection list servicenow.itsm
+      ansible.builtin.command: ansible-galaxy collection list community.general
       register: active_version
 
     - name: Print the winning version to the logs
