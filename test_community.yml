@@ -1,0 +1,27 @@
+---
+- name: Test Dynamic Community Collection Injection
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Ensure a temporary test directory exists
+      ansible.builtin.file:
+        path: /tmp/citiuscloud
+        state: directory
+        mode: '0755'
+
+    - name: Use the community.general collection to write a config file
+      community.general.ini_file:
+        path: /tmp/citiuscloud/givaudan_settings.ini
+        section: Platform_Upgrade
+        option: status
+        value: "Dynamic Injection Successful"
+        mode: '0644'
+
+    - name: Read the newly created file
+      ansible.builtin.command: cat /tmp/citiuscloud/givaudan_settings.ini
+      register: file_output
+      changed_when: false
+
+    - name: Print the proof to the logs
+      ansible.builtin.debug:
+        msg: "Community Code Executed! File contents: {{ file_output.stdout }}"
