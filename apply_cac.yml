@@ -6,10 +6,18 @@
 
   vars:
     controller_validate_certs: false
-    # THIS IS THE FIX: Tell the async tasks to wait much longer
-    # 120 retries * 5 seconds = 10 minutes of total wait time
+
+    # Generic async settings (fallback for all roles)
     controller_configuration_async_retries: 120
     controller_configuration_async_delay: 5
+
+    # Project-specific async settings (the role uses these exact names)
+    controller_configuration_projects_async_retries: 120
+    controller_configuration_projects_async_delay: 5
+
+    # Workaround for the int-as-bool deprecation bug in older collection versions:
+    # Disable async entirely for projects — run synchronously instead
+    controller_projects_async: false
 
   environment:
     CONTROLLER_VERIFY_SSL: "false"
