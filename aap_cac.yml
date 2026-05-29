@@ -1,0 +1,57 @@
+---
+- name: Apply CaC - Configure AAP Resources
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - aap_config.yml
+
+  tasks:
+
+    # ─── INVENTORIES ──────────────────────────────────────────────
+    - name: Create Inventories
+      ansible.controller.inventory:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        organization: "{{ item.organization }}"
+        state: present
+        validate_certs: false
+      loop: "{{ controller_inventories }}"
+
+    # ─── PROJECTS ─────────────────────────────────────────────────
+    - name: Create Projects
+      ansible.controller.project:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        organization: "{{ item.organization }}"
+        scm_type: "{{ item.scm_type }}"
+        scm_url: "{{ item.scm_url }}"
+        scm_branch: "{{ item.scm_branch }}"
+        scm_update_on_launch: "{{ item.scm_update_on_launch }}"
+        state: present
+        validate_certs: false
+      loop: "{{ controller_projects }}"
+
+    # ─── WAIT FOR PROJECT SYNC ────────────────────────────────────
+    - name: Wait for Projects to finish syncing
+      ansible.controller.project_update:
+        name: "{{ item.name }}"
+        organization: "{{ item.organization }}"
+        validate_certs: false
+      loop: "{{ controller_projects }}"
+
+    # ─── JOB TEMPLATES ────────────────────────────────────────────
+    - name: Create Job Templates
+      ansible.controller.job_template:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        job_type: "{{ item.job_type }}"
+        inventory: "{{ item.inventory }}"
+        project: "{{ item.project }}"
+        playbook: "{{ item.playbook }}"
+        verbosity: "{{ item.verbosity | default(0) }}"
+        job_slice_count: "{{ item.job_slice_count | default(1) }}"
+        state: present
+        validate_certs: false
+      loop: "{{ controller_templates }}"
