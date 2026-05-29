@@ -9,8 +9,8 @@
   # Note: The quotes around "60.0" are mandatory so YAML parses them as strings for the environment!
   environment:
     CONTROLLER_VERIFY_SSL: false
-    CONTROLLER_TIMEOUT: "60.0"
-    AAP_REQUEST_TIMEOUT: "60.0"
+    CONTROLLER_TIMEOUT: 60.0
+    AAP_REQUEST_TIMEOUT: 60.0
 
   tasks:
     - name: Read the CaC definitions into memory
