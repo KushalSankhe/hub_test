@@ -4,7 +4,6 @@
   connection: local
   gather_facts: false
 
-  # We only need this because your sandbox likely uses self-signed certs
   environment:
     CONTROLLER_VERIFY_SSL: false
 
@@ -17,3 +16,5 @@
     - name: Push all infrastructure elements to AAP
       ansible.controller.import:
         assets: "{{ config_assets }}"
+        # Explicitly setting a float overrides the string conversion bug
+        request_timeout: 60.0
