@@ -1,5 +1,5 @@
 ---
-- name: Apply GitOps Configuration to AAP
+- name: Apply GitOps Configuration using infra.aap_configuration
   hosts: localhost
   connection: local
   gather_facts: false
@@ -8,13 +8,10 @@
     CONTROLLER_VERIFY_SSL: false
 
   tasks:
-    - name: Read the CaC definitions
+    - name: Read the CaC definitions into memory
       ansible.builtin.include_vars:
         file: "./aap_config.yml"
-        name: config_assets
 
-    - name: Push all infrastructure elements to AAP
-      ansible.controller.import:
-        assets: "{{ config_assets }}"
-        # Explicitly setting a float overrides the string conversion bug
-        request_timeout: 60.0
+    - name: Dispatch the configuration to AAP
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.dispatch

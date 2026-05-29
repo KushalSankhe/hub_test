@@ -3,3 +3,4 @@ collections:
   - name: ansible.posix
   - name: servicenow.itsm
   - name: community.general 
+  - name: infra.aap_configuration
