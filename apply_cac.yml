@@ -6,6 +6,10 @@
 
   environment:
     CONTROLLER_VERIFY_SSL: false
+  # THIS IS THE FIX: It forces the float timeout across all AAP modules
+  module_defaults:
+    group/ansible.controller.controller:
+      request_timeout: 60.0
 
   tasks:
     - name: Read the CaC definitions into memory
