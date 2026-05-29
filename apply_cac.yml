@@ -6,8 +6,9 @@
 
   vars:
     controller_validate_certs: false
-    controller_request_timeout: 60
-    request_timeout: 60
+    controller_projects_async: false      # ← KEY FIX: disables async for projects
+    controller_inventories_async: false   # ← same for inventories
+    controller_templates_async: false     # ← same for templates
 
   environment:
     CONTROLLER_VERIFY_SSL: "false"
@@ -17,6 +18,14 @@
       ansible.builtin.include_vars:
         file: "{{ playbook_dir }}/aap_config.yml"
 
-    - name: Dispatch the configuration to AAP
+    - name: Create Inventories
       ansible.builtin.include_role:
-        name: infra.aap_configuration.dispatch
+        name: infra.aap_configuration.controller_inventories
+
+    - name: Create Projects
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_projects
+
+    - name: Create Job Templates
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_templates
