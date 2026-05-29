@@ -5,17 +5,17 @@
   gather_facts: false
 
   vars:
-    controller_validate_certs: false   # belt-and-suspenders for the collection
+    controller_validate_certs: false
+    controller_request_timeout: 60
+    request_timeout: 60
 
   environment:
     CONTROLLER_VERIFY_SSL: "false"
-    CONTROLLER_TIMEOUT: "60.0"
-    AAP_REQUEST_TIMEOUT: "60.0"
 
   tasks:
     - name: Read the CaC definitions into memory
       ansible.builtin.include_vars:
-        file: "{{ playbook_dir }}/aap_config.yml"   # absolute path — safer when run from AAP
+        file: "{{ playbook_dir }}/aap_config.yml"
 
     - name: Dispatch the configuration to AAP
       ansible.builtin.include_role:
