@@ -6,9 +6,6 @@
 
   vars:
     controller_validate_certs: false
-    controller_projects_async: false      # ← KEY FIX: disables async for projects
-    controller_inventories_async: false   # ← same for inventories
-    controller_templates_async: false     # ← same for templates
 
   environment:
     CONTROLLER_VERIFY_SSL: "false"
@@ -16,16 +13,8 @@
   tasks:
     - name: Read the CaC definitions into memory
       ansible.builtin.include_vars:
-        file: "{{ playbook_dir }}/aap_config.yml"
+        file: "./aap_config.yml"
 
-    - name: Create Inventories
+    - name: Dispatch the configuration to AAP
       ansible.builtin.include_role:
-        name: infra.aap_configuration.controller_inventories
-
-    - name: Create Projects
-      ansible.builtin.include_role:
-        name: infra.aap_configuration.controller_projects
-
-    - name: Create Job Templates
-      ansible.builtin.include_role:
-        name: infra.aap_configuration.controller_templates
+        name: infra.aap_configuration.dispatch
