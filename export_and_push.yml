@@ -1,0 +1,75 @@
+---
+- name: Export AAP Config and Push to GitHub
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    controller_validate_certs: false
+    export_dir: "/tmp/exported_config"
+    repo_dir: "/tmp/hub_test_repo"
+    github_repo: "https://github.com/KushalSankhe/hub_test.git"
+    git_branch: "main"
+    commit_message: "chore: auto-export AAP config {{ ansible_date_time.iso8601 }}"
+
+  tasks:
+
+    - name: Export AAP configuration
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_export
+      vars:
+        controller_export_all: true
+        controller_export_dir: "{{ export_dir }}"
+
+    - name: Clone the GitHub repository
+      ansible.builtin.git:
+        repo: "{{ github_repo }}"
+        dest: "{{ repo_dir }}"
+        version: "{{ git_branch }}"
+        force: true
+      environment:
+        GIT_USERNAME: "{{ scm_username }}"
+        GIT_PASSWORD: "{{ scm_token }}"
+
+    - name: Create aap_exports folder in repo
+      ansible.builtin.file:
+        path: "{{ repo_dir }}/aap_exports"
+        state: directory
+
+    - name: Copy exported config into repo
+      ansible.builtin.copy:
+        src: "{{ export_dir }}/"
+        dest: "{{ repo_dir }}/aap_exports/"
+
+    - name: Configure git user
+      ansible.builtin.shell: |
+        git config user.email "aap-bot@automation.local"
+        git config user.name "AAP Export Bot"
+      args:
+        chdir: "{{ repo_dir }}"
+
+    - name: Stage all changes
+      ansible.builtin.shell: git add -A
+      args:
+        chdir: "{{ repo_dir }}"
+
+    - name: Check if there are changes to commit
+      ansible.builtin.shell: git diff --cached --quiet
+      args:
+        chdir: "{{ repo_dir }}"
+      register: git_diff
+      failed_when: false
+
+    - name: Commit changes
+      ansible.builtin.shell: "git commit -m '{{ commit_message }}'"
+      args:
+        chdir: "{{ repo_dir }}"
+      when: git_diff.rc != 0   # only commit if there are actual changes
+
+    - name: Push to GitHub
+      ansible.builtin.shell: |
+        git push https://{{ scm_username }}:{{ scm_token }}@github.com/KushalSankhe/hub_test.git {{ git_branch }}
+      args:
+        chdir: "{{ repo_dir }}"
+      when: git_diff.rc != 0
+      no_log: true              # hides token from logs
