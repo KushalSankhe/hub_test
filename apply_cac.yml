@@ -4,18 +4,18 @@
   connection: local
   gather_facts: false
 
-  # THIS IS THE TRUE FIX FOR ASYNC TASKS:
-  # We explicitly override the corrupted sandbox variables here.
-  # Note: The quotes around "60.0" are mandatory so YAML parses them as strings for the environment!
+  vars:
+    controller_validate_certs: false   # belt-and-suspenders for the collection
+
   environment:
-    CONTROLLER_VERIFY_SSL: false
-    CONTROLLER_TIMEOUT: 60.0
-    AAP_REQUEST_TIMEOUT: 60.0
+    CONTROLLER_VERIFY_SSL: "false"
+    CONTROLLER_TIMEOUT: "60.0"
+    AAP_REQUEST_TIMEOUT: "60.0"
 
   tasks:
     - name: Read the CaC definitions into memory
       ansible.builtin.include_vars:
-        file: "./aap_config.yml"
+        file: "{{ playbook_dir }}/aap_config.yml"   # absolute path — safer when run from AAP
 
     - name: Dispatch the configuration to AAP
       ansible.builtin.include_role:

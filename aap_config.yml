@@ -15,14 +15,49 @@ controller_projects:
     scm_branch: "main"
     scm_update_on_launch: true
 
-# 3. Create the Job Template linked to the new Inventory and Project
+# 3. Create Job Templates for all playbooks
 controller_templates:
   - name: "Testing Service Now"
     description: "Template to test ServiceNow integration playbooks"
     job_type: "run"
     inventory: "Givaudan Test Inventory"
-    project: "Hub Test"
+    project: "Hub Test 2"          # Fixed: was "Hub Test"
     playbook: "test_snow.yml"
     verbosity: 0
-    forks: 0
+    job_slice_count: 1
+
+  - name: "Check EE Collections"
+    description: "Lists all collections installed inside the Execution Environment"
+    job_type: "run"
+    inventory: "Givaudan Test Inventory"
+    project: "Hub Test 2"
+    playbook: "check_ee.yml"
+    verbosity: 0
+    job_slice_count: 1
+
+  - name: "Check Collection Version"
+    description: "Verifies active collection versions inside the EE"
+    job_type: "run"
+    inventory: "Givaudan Test Inventory"
+    project: "Hub Test 2"
+    playbook: "check_version.yml"
+    verbosity: 0
+    job_slice_count: 1
+
+  - name: "Test POSIX"
+    description: "Runs ansible.posix collection tests"
+    job_type: "run"
+    inventory: "Givaudan Test Inventory"
+    project: "Hub Test 2"
+    playbook: "test_posix.yml"
+    verbosity: 0
+    job_slice_count: 1
+
+  - name: "Test Community General"
+    description: "Runs community.general collection tests"
+    job_type: "run"
+    inventory: "Givaudan Test Inventory"
+    project: "Hub Test 2"
+    playbook: "test_community.yml"
+    verbosity: 0
     job_slice_count: 1
