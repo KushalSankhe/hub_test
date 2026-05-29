@@ -7,7 +7,7 @@ controller_inventories:
 
 # 2. Connect AAP to your public GitHub Repository
 controller_projects:
-  - name: "Hub Test"
+  - name: "Hub Test 2"
     description: "Repository containing ServiceNow and testing playbooks"
     organization: "Default"
     scm_type: "git"
