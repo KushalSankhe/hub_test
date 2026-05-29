@@ -17,6 +17,7 @@
         organization: "{{ item.organization }}"
         state: present
         validate_certs: false
+        request_timeout: 60
       loop: "{{ controller_inventories }}"
 
     # ─── PROJECTS ─────────────────────────────────────────────────
@@ -31,6 +32,7 @@
         scm_update_on_launch: "{{ item.scm_update_on_launch }}"
         state: present
         validate_certs: false
+        request_timeout: 60
       loop: "{{ controller_projects }}"
 
     # ─── WAIT FOR PROJECT SYNC ────────────────────────────────────
@@ -39,6 +41,7 @@
         name: "{{ item.name }}"
         organization: "{{ item.organization }}"
         validate_certs: false
+        request_timeout: 60
       loop: "{{ controller_projects }}"
 
     # ─── JOB TEMPLATES ────────────────────────────────────────────
@@ -54,4 +57,5 @@
         job_slice_count: "{{ item.job_slice_count | default(1) }}"
         state: present
         validate_certs: false
+        request_timeout: 60
       loop: "{{ controller_templates }}"
