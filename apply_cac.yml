@@ -1,0 +1,19 @@
+---
+- name: Apply GitOps Configuration to AAP
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  # We only need this because your sandbox likely uses self-signed certs
+  environment:
+    CONTROLLER_VERIFY_SSL: false
+
+  tasks:
+    - name: Read the CaC definitions
+      ansible.builtin.include_vars:
+        file: "./aap_config.yml"
+        name: config_assets
+
+    - name: Push all infrastructure elements to AAP
+      ansible.controller.import:
+        assets: "{{ config_assets }}"

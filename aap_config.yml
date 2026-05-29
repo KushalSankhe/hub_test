@@ -1,0 +1,54 @@
+---
+# 1. Define the Inventory Structure
+controller_inventories:
+  - name: "Givaudan Test Inventory"
+    description: "UAT and Dev testing inventory for automation workflows"
+    organization: "Default"
+
+# 2. Add Hosts into the Inventory to create realistic data
+controller_hosts:
+  - name: "srv-app-dev01.givaudan.local"
+    description: "Dev Application Server 01"
+    inventory: "Givaudan Test Inventory"
+    enabled: true
+    variables:
+      ansible_host: "10.140.20.11"
+      environment_tier: "dev"
+
+  - name: "srv-app-dev02.givaudan.local"
+    description: "Dev Application Server 02"
+    inventory: "Givaudan Test Inventory"
+    enabled: true
+    variables:
+      ansible_host: "10.140.20.12"
+      environment_tier: "dev"
+
+  - name: "srv-db-uat01.givaudan.local"
+    description: "UAT Database Server"
+    inventory: "Givaudan Test Inventory"
+    enabled: true
+    variables:
+      ansible_host: "10.140.30.25"
+      environment_tier: "uat"
+
+# 3. Connect AAP to your public GitHub Repository
+controller_projects:
+  - name: "Hub Test"
+    description: "Repository containing ServiceNow and testing playbooks"
+    organization: "Default"
+    scm_type: "git"
+    scm_url: "https://github.com/KushalSankhe/hub_test.git"
+    scm_branch: "main"
+    scm_update_on_launch: true
+
+# 4. Create the Job Template linked to the new Inventory and Project
+controller_templates:
+  - name: "Testing Service Now"
+    description: "Template to test ServiceNow integration playbooks"
+    job_type: "run"
+    inventory: "Givaudan Test Inventory" # <--- Linked to the inventory above
+    project: "Hub Test"
+    playbook: "test_snow.yml"
+    verbosity: 0
+    forks: 0
+    job_slice_count: 1
