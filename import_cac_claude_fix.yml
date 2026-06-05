@@ -45,10 +45,12 @@
       register: aap_token_result
       changed_when: false
 
+      
     - name: Set aap_token fact
       ansible.builtin.set_fact:
         aap_token: "{{ aap_token_result.ansible_facts.aap_token.token }}"
         aap_token_url: "{{ aap_token_result.ansible_facts.aap_token.url }}"
+        controller_oauthtoken: "{{ aap_token_result.ansible_facts.aap_token.token }}"
 
   tasks:
     # Layer 1 - no dependencies
