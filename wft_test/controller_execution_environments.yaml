@@ -1,0 +1,15 @@
+---
+controller_execution_environments:
+  - name: "Minimal execution environment"
+    organization:  # Leave this empty organization to let the object_diff role to work properly
+    image: "registry.redhat.io/ansible-automation-platform-27/ee-minimal-rhel9@sha256:e7fa5d5b5bcaf81d52b5134fbe88e89ae552627756389ce726f03c44679b366d"
+    pull: "missing"
+  - name: "Default execution environment"
+    organization:  # Leave this empty organization to let the object_diff role to work properly
+    image: "registry.redhat.io/ansible-automation-platform-27/ee-supported-rhel9@sha256:c640e8f7478f6a38acbc610acf831c05378122b7873f18263cb648f79b6e8850"
+    pull: "missing"
+  - name: "Control Plane Execution Environment"
+    organization:  # Leave this empty organization to let the object_diff role to work properly
+    image: "registry.redhat.io/ansible-automation-platform-27/ee-supported-rhel9@sha256:c640e8f7478f6a38acbc610acf831c05378122b7873f18263cb648f79b6e8850"
+    pull: "missing"
+...

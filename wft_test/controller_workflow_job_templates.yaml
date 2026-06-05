@@ -1,0 +1,37 @@
+---
+controller_workflows:
+  - name: "Workflow_Template"
+    organization: "Default"
+    simplified_workflow_nodes:
+      - identifier: "6b0ddfdc-3b9a-46e3-bbbf-2149325a5d35"
+        workflow_job_template: "Workflow_Template"
+        unified_job_template: "Deploy Entire AAP Configuration"
+        limit: ""
+        organization: "Default"
+        all_parents_must_converge: "False"
+      - identifier: "67fbc335-7086-4413-9883-14fe4f76b6a5"
+        workflow_job_template: "Workflow_Template"
+        unified_job_template: "Check EE Collections"
+        limit: ""
+        organization: "Default"
+        all_parents_must_converge: "True"
+        always_nodes:
+          - "ead34a11-faed-4ffb-9c0b-109590aa3f64"
+      - identifier: "ead34a11-faed-4ffb-9c0b-109590aa3f64"
+        workflow_job_template: "Workflow_Template"
+        unified_job_template: "Test POSIX"
+        limit: ""
+        organization: "Default"
+        all_parents_must_converge: "False"
+    ask_variables_on_launch: "False"
+    allow_simultaneous: "True"
+    scm_branch: ""
+    limit: ""
+    ask_limit_on_launch: false
+    ask_inventory_on_launch: false
+    webhook_service: ""
+    extra_vars: ""
+    labels:
+      - "Test"
+    survey_enabled: false
+...

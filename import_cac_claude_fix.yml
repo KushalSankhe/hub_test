@@ -1,0 +1,191 @@
+---
+- name: Import AAP Configuration to new AAP instance
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    aap_hostname: "aap-27-giv-aap-sbx.apps.ocpv.citiuscloud.local"
+    aap_username: "kushal"
+    aap_password: "admin@123"
+    aap_validate_certs: false
+
+    # AAP 2.5+ uses aap_* variables, not controller_*
+    controller_hostname: "{{ aap_hostname }}"
+    controller_username: "{{ aap_username }}"
+    controller_password: "{{ aap_password }}"
+    controller_validate_certs: "{{ aap_validate_certs }}"
+
+    controller_projects_async: false
+    controller_configuration_async_retries: 120
+    controller_configuration_async_delay: 5
+    controller_configuration_projects_async_retries: 120
+    controller_configuration_projects_async_delay: 5
+    controller_configuration_credentials_secure_logging: false
+
+  pre_tasks:
+    - name: Load all exported config files into memory
+      ansible.builtin.include_vars:
+        dir: "./wft_test"
+          #dir: "/root/aap-export/aap_exports"
+        extensions:
+          - yaml
+          - yml
+
+    # Official recommended method for AAP 2.5+
+    - name: Create auth token using ansible.platform
+      ansible.platform.token:
+        description: "CaC import token"
+        scope: "write"
+        state: present
+        aap_hostname: "{{ aap_hostname }}"
+        aap_username: "{{ aap_username }}"
+        aap_password: "{{ aap_password }}"
+        aap_validate_certs: "{{ aap_validate_certs }}"
+      register: aap_token_result
+      changed_when: false
+
+    - name: Set aap_token fact
+      ansible.builtin.set_fact:
+        aap_token: "{{ aap_token_result.ansible_facts.aap_token.token }}"
+        aap_token_url: "{{ aap_token_result.ansible_facts.aap_token.url }}"
+
+  tasks:
+    # Layer 1 - no dependencies
+    - name: Apply organizations
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_organizations
+      when:
+        - controller_organizations is defined
+        - controller_organizations | length > 0
+
+    - name: Apply credential types
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_credential_types
+      when:
+        - controller_credential_types is defined
+        - controller_credential_types | length > 0
+
+    - name: Apply execution environments
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_execution_environments
+      when:
+        - controller_execution_environments is defined
+        - controller_execution_environments | length > 0
+
+    - name: Apply instance groups
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_instance_groups
+      when:
+        - controller_instance_groups is defined
+        - controller_instance_groups | length > 0
+
+    # Layer 2 - depends on orgs + credential_types
+    - name: Apply credentials
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_credentials
+      when: controller_credentials | length > 0
+
+    # Layer 3 - depends on credentials
+    - name: Apply projects
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_projects
+      when:
+        - controller_projects is defined
+        - controller_projects | length > 0
+
+    - name: Apply inventories
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_inventories
+      when:
+        - controller_inventories is defined
+        - controller_inventories | length > 0
+
+    - name: Apply inventory sources
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_inventory_sources
+      when:
+        - controller_inventory_sources is defined
+        - controller_inventory_sources | length > 0
+
+    - name: Apply hosts
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_hosts
+      when:
+        - controller_hosts is defined
+        - controller_hosts | length > 0
+
+    - name: Apply host groups
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_host_groups
+      when:
+        - controller_groups is defined
+        - controller_groups | length > 0
+
+    # Layer 4 - depends on projects + inventories + credentials
+    - name: Apply labels
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_labels
+      when:
+        - controller_labels is defined
+        - controller_labels | length > 0
+
+    - name: Apply job templates
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_job_templates
+      when:
+        - controller_templates is defined
+        - controller_templates | length > 0
+
+    - name: Apply workflow job templates
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_workflow_job_templates
+      when:
+        - controller_workflows is defined
+        - controller_workflows | length > 0
+
+    - name: Apply notification templates
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_notification_templates
+      when:
+        - controller_notifications is defined
+        - controller_notifications | length > 0
+
+    - name: Apply schedules
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_schedules
+      when:
+        - controller_schedules is defined
+        - controller_schedules | length > 0
+
+    # Layer 5 - RBAC last
+    - name: Apply teams
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_teams
+      when:
+        - controller_teams is defined
+        - controller_teams | length > 0
+
+    - name: Apply users
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_users
+      when:
+        - controller_users is defined
+        - controller_users | length > 0
+
+    - name: Apply roles
+      ansible.builtin.include_role:
+        name: infra.aap_configuration.controller_roles
+      when:
+        - controller_roles is defined
+        - controller_roles | length > 0    
+  post_tasks:
+    - name: Delete the auth token
+      ansible.platform.token:
+        state: absent
+        existing_token_id: "{{ aap_token_result.ansible_facts.aap_token.id }}"
+        aap_hostname: "{{ aap_hostname }}"
+        aap_username: "{{ aap_username }}"
+        aap_password: "{{ aap_password }}"
+        aap_validate_certs: "{{ aap_validate_certs }}"
+      when: aap_token_result is defined

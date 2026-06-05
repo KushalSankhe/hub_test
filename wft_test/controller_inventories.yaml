@@ -1,0 +1,16 @@
+---
+controller_inventories:
+  - name: "Demo Inventory"
+    organization: "Default"
+    prevent_instance_group_fallback: false
+  - name: "Test inventory"
+    organization: "Default"
+    prevent_instance_group_fallback: false
+  - name: "Givaudan Test Inventory"
+    description: |-
+      {%- raw -%}
+      UAT and Dev testing inventory for automation workflows
+      {%- endraw -%}
+    organization: "Default"
+    prevent_instance_group_fallback: false
+...
